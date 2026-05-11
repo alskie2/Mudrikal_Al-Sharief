@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Result</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fafafa;
+      color: #1a1a1a;
+    }
+
+    body {
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 40px;
+      padding-bottom: 40px;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 700px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: -0.5px;
+    }
+
+    .result-box {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      margin-bottom: 24px;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .verdict {
+      display: inline-block;
+      padding: 16px 32px;
+      border-radius: 100px;
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 16px 0;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .verdict.satisfied {
+      background: #d4f4e7;
+      color: #0d6e47;
+    }
+
+    .verdict.dissatisfied {
+      background: #fce4e4;
+      color: #8b2323;
+    }
+
+    .verdict.neutral {
+      background: #fef3e0;
+      color: #7c4e0a;
+    }
+
+    .confidence-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .confidence-text {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+    }
+
+    .confidence-score {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .confidence-bar {
+      width: 100%;
+      height: 12px;
+      background: #e5e5e5;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .confidence-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.8s ease-out;
+    }
+
+    .confidence-fill.satisfied {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .confidence-fill.dissatisfied {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .confidence-fill.neutral {
+      background: linear-gradient(90deg, #f59e0b, #d97706);
+    }
+
+    /* Gauge Section */
+    .gauge-section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+    }
+
+    .gauge {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      margin-bottom: 16px;
+    }
+
+    .gauge-track {
+      position: absolute;
+      width: 100%;
+      height: 16px;
+      background: #e5e5e5;
+      border-radius: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      overflow: hidden;
+    }
+
+    .gauge-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #10b981 100%);
+      border-radius: 8px;
+      transition: width 0.8s ease-out;
+      width: 0%;
+    }
+
+    .gauge-pointer {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: #1a1a1a;
+      border-radius: 50%;
+      top: 50%;
+      left: 0%;
+      transform: translate(-50%, -50%);
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      transition: left 0.8s ease-out;
+      z-index: 10;
+    }
+
+    .gauge-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 12px;
+      font-size: 12px;
+      color: #999;
+      font-weight: 500;
+    }
+
+    .gauge-value {
+      text-align: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-top: 16px;
+    }
+
+    /* Improvements Section */
+    .improvements-section {
+      background: #fef3e0;
+      border: 1px solid #f0d9a8;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .improvements-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #7c4e0a;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .improvement-item {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(124, 78, 10, 0.1);
+    }
+
+    .improvement-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .improvement-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .improvement-name {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .improvement-current {
+      background: #f5f5f5;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .improvement-desc {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .improvement-impact {
+      font-size: 12px;
+      color: #7c4e0a;
+      font-weight: 600;
+    }
+
+    /* Analysis Section */
+    .analysis-section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .factor {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .factor:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .factor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .factor-name {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .factor-values {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .factor-value {
+      background: #f0f0f0;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .importance-badge {
+      background: #e8e8e8;
+      color: #666;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .factor-bar {
+      width: 100%;
+      height: 8px;
+      background: #e5e5e5;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .factor-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease-out;
+    }
+
+    .factor-fill.red {
+      background: #ef4444;
+    }
+
+    .factor-fill.yellow {
+      background: #f59e0b;
+    }
+
+    .factor-fill.green {
+      background: #10b981;
+    }
+
+    /* What-If Simulator */
+    .simulator-section {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .simulator-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+    }
+
+    .simulator-item {
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 12px;
+    }
+
+    .simulator-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .simulator-label {
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      font-size: 14px;
+    }
+
+    .slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e5e5e5;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #1a1a1a;
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .slider-value {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .slider-prediction {
+      background: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 2px solid #1a1a1a;
+      margin-top: 12px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      color: #1a1a1a;
+    }
+
+    .slider-prediction.satisfied {
+      background: #d4f4e7;
+      color: #0d6e47;
+      border-color: #10b981;
+    }
+
+    .slider-prediction.dissatisfied {
+      background: #fce4e4;
+      color: #8b2323;
+      border-color: #ef4444;
+    }
+
+    /* Flight Details */
+    .flight-details {
+      background: white;
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+      border: 1px solid #e5e5e5;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .detail-item {
+      text-align: center;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    a, button {
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+      border: none;
+      font-size: 14px;
+      letter-spacing: 0.3px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #1a1a1a;
+      color: white;
+      flex: 1;
+    }
+
+    .btn-primary:hover {
+      background: #2a2a2a;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      flex: 0;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 12px;
+      color: #999;
+    }
+
+    @media (max-width: 600px) {
+      .wrapper {
+        max-width: 100%;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .result-box,
+      .gauge-section,
+      .improvements-section,
+      .analysis-section,
+      .simulator-section,
+      .flight-details {
+        padding: 24px;
+      }
+
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .btn-secondary {
+        flex: 1;
+      }
+
+      .factor-values {
+        flex-direction: column;
+        gap: 4px;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <header>
+      <h1>Your Result</h1>
+    </header>
+
+    <!-- Main Result with Confidence -->
+    <div class="result-box">
+      <div class="verdict {% if 'Satisfied' in result %}satisfied{% elif 'neutral' in result.lower %}neutral{% else %}dissatisfied{% endif %}">
+        {{ result }}
+      </div>
+      <div class="confidence-section">
+        <p class="confidence-text">Model Confidence</p>
+        <div class="confidence-score">{{ confidence }}%</div>
+        <div class="confidence-bar">
+          <div class="confidence-fill {% if 'Satisfied' in result %}satisfied{% elif 'neutral' in result.lower %}neutral{% else %}dissatisfied{% endif %}" style="width: {{ confidence }}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Satisfaction Gauge -->
+    <div class="gauge-section">
+      <div class="section-title">Satisfaction Meter</div>
+      <div class="gauge">
+        <div class="gauge-track">
+          <div class="gauge-fill" id="gaugeFill"></div>
+        </div>
+        <div class="gauge-pointer" id="gaugePointer"></div>
+        <div class="gauge-labels">
+          <span>Dissatisfied</span>
+          <span>Satisfied</span>
+        </div>
+      </div>
+      <div class="gauge-value" id="gaugeValue">0%</div>
+    </div>
+
+    <!-- Flight Details Card -->
+    <div class="flight-details">
+      <div class="section-title">Your Flight Profile</div>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Class</div>
+          <div class="detail-value">{{ travel_class }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Travel Type</div>
+          <div class="detail-value">{{ type_of_travel }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Distance</div>
+          <div class="detail-value">{{ flight_distance }} <span style="font-size: 12px; color: #999;">km</span></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Total Delay</div>
+          <div class="detail-value">{{ total_delay }} <span style="font-size: 12px; color: #999;">min</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Improvements Section -->
+    <div class="improvements-section">
+      <div class="improvements-title">🔧 TOP AREAS TO IMPROVE</div>
+      <div id="improvementsContainer"></div>
+    </div>
+
+    <!-- Analysis Section -->
+    <div class="analysis-section">
+      <div class="section-title">How Your Ratings Impact</div>
+      <div id="analysisContainer"></div>
+    </div>
+
+    <!-- What-If Simulator -->
+    <div class="simulator-section">
+      <div class="simulator-title">🎯 What If Simulator</div>
+      <p style="font-size: 13px; color: #666; margin-bottom: 20px;">Adjust any rating below to instantly see how it affects your satisfaction prediction</p>
+      <div id="simulatorContainer"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <a href="/" class="btn-primary">← Check Another Flight</a>
+      <button class="btn-secondary" onclick="window.print()">Print</button>
+    </div>
+
+    <footer>
+      Powered by ML model trained on 100k+ airline reviews
+    </footer>
+  </div>
+
+  <script>
+    // Data
+ // FIXED - sat_probability added
+const data = {
+  online_boarding: {{ online_boarding }},
+  inflight_wifi: {{ inflight_wifi }},
+  seat_comfort: {{ seat_comfort }},
+  cleanliness: {{ cleanliness }},
+  flight_distance: {{ flight_distance }},
+  total_delay: {{ total_delay }},
+  confidence: {{ confidence }},
+  sat_probability: {{ sat_probability }}, 
+  is_satisfied: "{{ result }}".includes("Satisfied") && !("{{ result }}".includes("Neutral"))
+};
+
+    // Feature importance from your model
+    const importance = {
+      online_boarding: 21.9,
+      inflight_wifi: 20.4,
+      flight_distance: 16.3,
+      travel_class: 12.3,
+      type_of_travel: 10.6,
+      seat_comfort: 8.5,
+      total_delay: 5.4,
+      cleanliness: 4.6
+    };
+
+    // Render gauge
+    // FIXED - real model probability ✅
+function renderGauge() {
+  const score = data.sat_probability;  // comes from predict_proba[1]
+  
+  document.getElementById('gaugeFill').style.width = score + '%';
+  document.getElementById('gaugePointer').style.left = score + '%';
+  document.getElementById('gaugeValue').textContent = Math.round(score) + '% satisfaction';
+}
+
+    // Get color based on rating
+    function getColor(rating) {
+      if (rating >= 4) return 'green';
+      if (rating >= 3) return 'yellow';
+      return 'red';
+    }
+
+    // Get improvement suggestions
+    function getImprovements() {
+      const factors = [
+        { name: 'Online Boarding', value: data.online_boarding, importance: 21.9, target: 4 },
+        { name: 'Inflight Wifi', value: data.inflight_wifi, importance: 20.4, target: 4 },
+        { name: 'Seat Comfort', value: data.seat_comfort, importance: 8.5, target: 4 },
+        { name: 'Cleanliness', value: data.cleanliness, importance: 4.6, target: 4 }
+      ];
+
+      return factors
+        .filter(f => f.value < 4)
+        .sort((a, b) => b.importance - a.importance)
+        .slice(0, 3);
+    }
+
+    // Render improvements
+    function renderImprovements() {
+      const improvements = getImprovements();
+      const container = document.getElementById('improvementsContainer');
+      
+      if (improvements.length === 0) {
+        container.innerHTML = '<p style="color: #7c4e0a; font-size: 13px;">✅ All critical areas are performing well!</p>';
+        return;
+      }
+
+      container.innerHTML = improvements.map((item, i) => `
+        <div class="improvement-item">
+          <div class="improvement-header">
+            <div class="improvement-name">${i + 1}. ${item.name}</div>
+            <div class="improvement-current">${item.value}/5</div>
+          </div>
+          <div class="improvement-desc">Improve from ${item.value}/5 to 4/5 for better results</div>
+          <div class="improvement-impact">Impact: ${item.importance}% of satisfaction</div>
+        </div>
+      `).join('');
+    }
+
+    // Render analysis
+    function renderAnalysis() {
+      const factors = [
+        { name: 'Online Boarding', value: data.online_boarding, importance: 21.9 },
+        { name: 'Inflight Wifi', value: data.inflight_wifi, importance: 20.4 },
+        { name: 'Flight Distance', value: data.flight_distance, importance: 16.3, isDistance: true },
+        { name: 'Seat Comfort', value: data.seat_comfort, importance: 8.5 },
+        { name: 'Total Delay', value: data.total_delay, importance: 5.4, isDelay: true },
+        { name: 'Cleanliness', value: data.cleanliness, importance: 4.6 }
+      ];
+
+      const container = document.getElementById('analysisContainer');
+      container.innerHTML = factors.map(f => {
+        let width = f.isDistance ? Math.min(100, (f.value / 10000) * 100) : 
+                    f.isDelay ? Math.min(100, (f.value / 120) * 100) : (f.value * 20);
+        
+        return `
+          <div class="factor">
+            <div class="factor-header">
+              <div class="factor-name">${f.name}</div>
+              <div class="factor-values">
+                <div class="factor-value">${f.isDistance ? f.value + ' km' : f.isDelay ? f.value + ' min' : f.value + '/5'}</div>
+                <div class="importance-badge">${f.importance}% impact</div>
+              </div>
+            </div>
+            <div class="factor-bar">
+              <div class="factor-fill ${f.isDistance || f.isDelay ? 'green' : getColor(f.value)}" style="width: ${width}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render what-if simulator
+    function renderSimulator() {
+      const factors = [
+        { key: 'online_boarding', name: 'Online Boarding', importance: 21.9 },
+        { key: 'inflight_wifi', name: 'Inflight Wifi', importance: 20.4 },
+        { key: 'seat_comfort', name: 'Seat Comfort', importance: 8.5 },
+        { key: 'cleanliness', name: 'Cleanliness', importance: 4.6 }
+      ];
+
+      const container = document.getElementById('simulatorContainer');
+      container.innerHTML = factors.map(f => `
+        <div class="simulator-item">
+          <div class="simulator-label">${f.name}</div>
+          <input type="range" class="slider" min="1" max="5" value="${data[f.key]}" 
+                 data-key="${f.key}" data-name="${f.name}" data-importance="${f.importance}">
+          <div class="slider-value">
+            <span>${f.name}</span>
+            <span id="val-${f.key}">${data[f.key]}/5</span>
+          </div>
+          <div class="slider-prediction" id="pred-${f.key}" style="display: none;"></div>
+        </div>
+      `).join('');
+
+      // Add event listeners
+      document.querySelectorAll('.slider').forEach(slider => {
+        slider.addEventListener('input', function() {
+          const key = this.getAttribute('data-key');
+          const value = parseInt(this.value);
+          document.getElementById(`val-${key}`).textContent = value + '/5';
+
+          // Simulate prediction change
+          updateSimulatorPrediction(key, value);
+        });
+      });
+    }
+
+    // Update simulator prediction
+    function updateSimulatorPrediction(changedKey, changedValue) {
+      const simData = { ...data };
+      simData[changedKey] = changedValue;
+
+      // Simple heuristic: if top 2 factors are good, it's satisfied
+      const avgTop2 = (simData.online_boarding + simData.inflight_wifi) / 2;
+      const avgAll = (simData.online_boarding + simData.inflight_wifi + 
+                     simData.seat_comfort + simData.cleanliness) / 4;
+
+      let wouldBeSatisfied = avgTop2 >= 3.5 && avgAll >= 2.8;
+
+      // Show prediction
+      document.querySelectorAll('.slider-prediction').forEach(el => el.style.display = 'none');
+      
+      const predElement = document.getElementById(`pred-${changedKey}`);
+      if (predElement) {
+        predElement.style.display = 'block';
+        if (wouldBeSatisfied) {
+          predElement.className = 'slider-prediction satisfied';
+          predElement.textContent = '→ Likely SATISFIED ✅';
+        } else {
+          predElement.className = 'slider-prediction dissatisfied';
+          predElement.textContent = '→ Likely DISSATISFIED ❌';
+        }
+      }
+    }
+
+    // Initialize
+    renderGauge();
+    renderImprovements();
+    renderAnalysis();
+    renderSimulator();
+  </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<form method="post">
+    {% csrf_token %}
+    Age: <input type="number" name="age"><br>
+    Distance: <input type="number" name="distance"><br>
+    Wifi: <input type="number" name="wifi"><br>
+    Comfort: <input type="number" name="comfort"><br>
+    Cleanliness: <input type="number" name="clean"><br>
+    Delay: <input type="number" name="delay"><br>
+    <button type="submit">Predict</button>
+</form>
