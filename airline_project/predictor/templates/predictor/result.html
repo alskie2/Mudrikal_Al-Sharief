@@ -680,15 +680,15 @@
     // Data
  // FIXED - sat_probability added
 const data = {
-  online_boarding: {{ online_boarding }},
-  inflight_wifi: {{ inflight_wifi }},
-  seat_comfort: {{ seat_comfort }},
-  cleanliness: {{ cleanliness }},
-  flight_distance: {{ flight_distance }},
-  total_delay: {{ total_delay }},
-  confidence: {{ confidence }},
-  sat_probability: {{ sat_probability }}, 
-  is_satisfied: "{{ result }}".includes("Satisfied") && !("{{ result }}".includes("Neutral"))
+  online_boarding: parseInt("{{ online_boarding }}"),      
+  inflight_wifi: parseInt("{{ inflight_wifi }}"),          
+  seat_comfort: parseInt("{{ seat_comfort }}"),            
+  cleanliness: parseInt("{{ cleanliness }}"),              
+  flight_distance: parseInt("{{ flight_distance }}"),      
+  total_delay: parseInt("{{ total_delay }}"),              
+  confidence: parseFloat("{{ confidence }}"),              
+  sat_probability: parseFloat("{{ sat_probability | default:0 }}"), 
+  is_satisfied: "{{ result }}".includes("Satisfied")       
 };
 
     // Feature importance from your model
